@@ -22,9 +22,9 @@ def get_background(name):
     tiles = []
     
     #have tiles in X axis filled across with background. 1 is added as to ensure nothing is missed and provided extra cover
-    for i in range(WIDTH // WIDTH + 1):
+    for i in range(WIDTH // width + 1):
         #have tiles filed in the Y axis across with background
-        for j in range(HEIGHT// HEIGHT + 1):
+        for j in range(HEIGHT// height + 1):
             #denote the positon of the top left hand corner 
             pos = (i * width, j * height)
             tiles.append(pos)
@@ -43,7 +43,7 @@ def draw(window, background,bg_image):
 def main(window):
     clock = pygame.time.Clock()
     #Assign background based on file name, in this case I'll use blue 
-    background, bg_image = get_background("Blue.png")
+    background, bg_image = get_background("Gray.png")
 
     run = True
     while run:
@@ -53,6 +53,7 @@ def main(window):
             if event.type == pygame.QUIT:
                 run = False
                 break
+
         draw(window,background, bg_image)
 
 
