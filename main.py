@@ -8,15 +8,42 @@ pygame.init()
 
 pygame.display.set_caption("Platformer")
 
-BG_COLOUR = (255,255,255)
+
 WIDTH,HEIGHT = 1000,800
 FPS = 60
 PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 
+def get_background(name):
+    image = pygame.image.load(join("assets","Background",name))
+    #not focused on the X & Y value below that is why "_"/underscore has been used
+    _,_, width, height = image.get_rect()
+    tiles = []
+    
+    #have tiles in X axis filled across with background. 1 is added as to ensure nothing is missed and provided extra cover
+    for i in range(WIDTH // WIDTH + 1):
+        #have tiles filed in the Y axis across with background
+        for j in range(HEIGHT// HEIGHT + 1):
+            #denote the positon of the top left hand corner 
+            pos = (i * width, j * height)
+            tiles.append(pos)
+
+    return tiles,image
+
+
+def draw(window, background,bg_image):
+    for tile in background:
+        window.blit(bg_image, tile)
+
+
+    pygame.display.update()
+
+
 def main(window):
     clock = pygame.time.Clock()
+    #Assign background based on file name, in this case I'll use blue 
+    background, bg_image = get_background("Blue.png")
 
     run = True
     while run:
@@ -26,7 +53,9 @@ def main(window):
             if event.type == pygame.QUIT:
                 run = False
                 break
-    
+        draw(window,background, bg_image)
+
+
     pygame.quit()
     quit()
 
