@@ -50,7 +50,14 @@ class Player(pygame.sprite.Sprite):
     def draw(self,win):
         pygame.draw.rect(win,self.COLOR, self.rect)
 
-
+def handle_move(player):
+    keys = pygame.key.get_pressed()
+    
+    player.x_vel = 0
+    if keys[pygame.K_LEFT]:
+        player.move_left(PLAYER_VEL)
+    if keys[pygame.K_RIGHT]:
+        player.move_right(PLAYER_VEL)
 
 def get_background(name):
     image = pygame.image.load(join("assets","Background",name))
@@ -92,7 +99,9 @@ def main(window):
             if event.type == pygame.QUIT:
                 run = False
                 break
-
+        
+        player.loop(FPS)
+        handle_move(player)
         draw(window,background, bg_image,player)
 
 
