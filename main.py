@@ -182,11 +182,12 @@ def main(window):
     #Assign background based on file name, in this case I'll use blue 
     background, bg_image = get_background("Blue.png")
 
-    blocks_size = 90
+    block_size = 90
 
     player = Player(100,100,50,50)
-    blocks = [Block(0, HEIGHT - blocks_size, blocks_size)]
-
+    floor = [Block(i * block_size, HEIGHT - block_size, block_size)
+             for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
+   
     run = True
     while run:
         clock.tick(FPS)
@@ -198,7 +199,7 @@ def main(window):
         
         player.loop(FPS)
         handle_move(player)
-        draw(window,background, bg_image,player, blocks)
+        draw(window,background, bg_image,player, floor)
 
 
     pygame.quit()
