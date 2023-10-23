@@ -74,6 +74,8 @@ class Player(pygame.sprite.Sprite):
         self.animation_count = 0
         self.fall_count = 0
         self.jump_count =0
+        self.hit = False
+        self.hit_count = 0
 
     def jump(self):
         self.y_vel = -self.GRAVITY * 8
@@ -86,6 +88,10 @@ class Player(pygame.sprite.Sprite):
     def move(self, dx,dy):
         self.rect.x += dx
         self.rect.y += dy
+
+    def make_hit(self):
+        self.hit = True
+        self.hit_count = 0
 
     def move_left(self,vel):
         self.x_vel = -vel
@@ -103,6 +109,12 @@ class Player(pygame.sprite.Sprite):
         self.y_vel += min(1,(self.fall_count/  FPS) * self.GRAVITY)
         self.move(self.x_vel, self.y_vel)
 
+        if self.hit:
+            self.hit_count += 1
+        if self.hit_count > fps * 2:
+            self.hit = False
+
+
         self.fall_count += 1
         self.update_sprite()
         
@@ -117,7 +129,9 @@ class Player(pygame.sprite.Sprite):
 
     def update_sprite(self):
         sprite_sheet = "idle"
-        if self.y_vel < 0:
+        if self.hit:
+            sprite_sheet = "hit"
+        elif self.y_vel < 0:
             if self.jump_count == 1:
                 sprite_sheet = "jump"
             elif self.jump_count ==2:
@@ -233,7 +247,11 @@ def handle_move(player, objects):
     if keys[pygame.K_RIGHT] and not collide_right:
         player.move_right(PLAYER_VEL)
 
-    handle_vertical_collision(player,objects, player.y_vel)
+    vertical_collide =  handle_vertical_collision(player,objects, player.y_vel)
+    to_check = [collide_left,collide_right, *vertical_collide]
+    for obj in to_check:
+        if obj and obj.name == "fire":
+            player.make_hit()
 
 def get_background(name):
     image = pygame.image.load(join("assets","Background",name))
@@ -265,16 +283,19 @@ def draw(window, background,bg_image,player, objects, offset_x):
 def main(window):
     clock = pygame.time.Clock()
     #Assign background based on file name, in this case I'll use blue 
-    background, bg_image = get_background("Blue.png")
+    background, bg_image = get_background("Brown.png")
 
     block_size = 90
 
     player = Player(100,100,50,50)
-    fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
-    fire.on()
+    fire1 = Fire(500, 500 - block_size - 64, 16, 32)
+    fire2 = Fire(100, 500 - block_size - 64, 16, 32)
+    
+    fire1.on()
+    fire2.on()
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
-    objects = [*floor, Block(0, HEIGHT - block_size *2, block_size), Block(block_size * 2, HEIGHT - block_size * 4, block_size),fire]
+    objects = [*floor, Block(100, HEIGHT - block_size *2, block_size), Block(block_size * 2, HEIGHT - block_size * 4, block_size), Block(100,200, block_size),fire1,fire2]
     
     offset_x = 0
     scroll_area_width = 200
@@ -294,7 +315,8 @@ def main(window):
                     player.jump()
         
         player.loop(FPS)
-        fire.loop()
+        fire2.loop()
+        fire1.loop()
         handle_move(player, objects)
         draw(window,background, bg_image,player, objects, offset_x)
 
